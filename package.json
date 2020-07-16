@@ -1,0 +1,24 @@
+{
+  "name": "streams-api-worker",
+  "version": "1.0.0",
+  "description": "Woke.net stream data API",
+  "main": "index.js",
+  "scripts": {
+    "prettier": "prettier --write *.js",
+    "build": "wrangler build",
+    "dev": "wrangler dev",
+    "publish": "wrangler publish"
+  },
+  "author": "Max Goodhart <c@chromakode.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/wrangler": "^1.10.3",
+    "prettier": "^2.0.5"
+  },
+  "dependencies": {
+    "http-errors": "^1.8.0",
+    "lodash.camelcase": "^4.3.0",
+    "lodash.mapkeys": "^4.6.0",
+    "papaparse": "^5.2.0"
+  }
+}

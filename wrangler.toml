@@ -1,0 +1,12 @@
+name = "streams-api-worker"
+type = "webpack"
+routes = [
+  "woke.net/api/streams.json*",
+  "woke.net/api/stats.json",
+]
+
+[vars]
+CURRENT_SHEET_NAME = "Current Streams (sorted)"
+ALL_SHEET_NAME = "All Streams"
+TTL = 10
+
