@@ -7,14 +7,14 @@ Based on https://github.com/chromakode/sheet2json-worker.
 
 ## Endpoints:
 
-### https://woke.net/api/streams.json
+### https://api.woke.net/streams.json
 
 Fetch information about current and recently live streams.
 
-### https://woke.net/api/streams.json?date=YYYY-MM-DD
+### https://api.woke.net/streams.json?date=YYYY-MM-DD
 
 Fetch historical information about live streams for the date specified.
 
-### https://woke.net/api/stats.json
+### https://api.woke.net/stats.json
 
 Fetch stats of current stream counts.
