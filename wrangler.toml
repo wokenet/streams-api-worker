@@ -3,6 +3,8 @@ type = "webpack"
 routes = [
   "woke.net/api/streams.json*",
   "woke.net/api/stats.json",
+  "api.woke.net/streams.json*",
+  "api.woke.net/stats.json",
 ]
 
 [vars]
