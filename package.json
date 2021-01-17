@@ -19,6 +19,7 @@
     "http-errors": "^1.8.0",
     "lodash.camelcase": "^4.3.0",
     "lodash.mapkeys": "^4.6.0",
-    "papaparse": "^5.2.0"
+    "papaparse": "^5.2.0",
+    "tiny-request-router": "^1.2.2"
   }
 }

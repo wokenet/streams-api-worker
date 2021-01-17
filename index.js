@@ -1,3 +1,4 @@
+const { Router } = require('tiny-request-router')
 const createError = require('http-errors')
 const Papa = require('papaparse')
 const camelCase = require('lodash.camelcase')
@@ -47,21 +48,54 @@ async function fetchStreams({ dateFilter } = {}) {
   return rows
 }
 
-async function handleRequest(requestURL) {
-  const { pathname } = requestURL
+const baseHeaders = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*',
+}
 
-  let responseData
+const cacheHeaders = {
+  'Cache-Control': `max-age=${TTL}`,
+}
+
+const router = new Router()
+
+router.get('/streams.json', async (requestURL) => {
+  const dateFilter = requestURL.searchParams.get('date')
+  const streams = await fetchStreams({ dateFilter })
+  responseData = streams.filter(({ link, platform }) => link && platform)
+  return new Response(JSON.stringify(responseData), {
+    headers: {
+      ...baseHeaders,
+      ...cacheHeaders,
+    },
+  })
+})
+
+router.get('/stats.json', async () => {
+  const streams = await fetchStreams()
+  responseData = {
+    tracking: streams.length,
+    live: streams.filter(({ status }) => status === 'Live').length,
+  }
+  return new Response(JSON.stringify(responseData), {
+    headers: {
+      ...baseHeaders,
+      ...cacheHeaders,
+    },
+  })
+})
+
+addEventListener('fetch', async (event) => {
+  const { request } = event
+  const requestURL = new URL(request.url)
+
+  const match = router.match(request.method, requestURL.pathname)
+
+  let response
+
   try {
-    if (pathname.endsWith('stats.json')) {
-      const streams = await fetchStreams()
-      responseData = {
-        tracking: streams.length,
-        live: streams.filter(({ status }) => status === 'Live').length,
-      }
-    } else if (pathname.endsWith('streams.json')) {
-      const dateFilter = requestURL.searchParams.get('date')
-      const streams = await fetchStreams({ dateFilter })
-      responseData = streams.filter(({ link, platform }) => link && platform)
+    if (match) {
+      event.respondWith(match.handler(requestURL))
     } else {
       throw createError(404)
     }
@@ -69,26 +103,9 @@ async function handleRequest(requestURL) {
     if (createError.isHttpError(err)) {
       return new Response(JSON.stringify({ error: err.message }), {
         status: err.status,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
+        headers: baseHeaders,
       })
     }
     throw err
   }
-
-  response = new Response(JSON.stringify(responseData), {
-    headers: {
-      'Cache-Control': `max-age=${TTL}`,
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    },
-  })
-  return response
-}
-
-addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url)
-  event.respondWith(handleRequest(url))
 })
