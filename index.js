@@ -4,6 +4,7 @@ const Papa = require('papaparse')
 const camelCase = require('lodash.camelcase')
 
 const apiKeys = new Set(API_KEYS.split(','))
+const allowedIPs = new Set(ALLOWED_IPS.split(','))
 
 function parseCSV(csvString, config) {
   return new Promise((resolve, reject) => {
@@ -61,11 +62,12 @@ const cacheHeaders = {
 
 const router = new Router()
 
-router.get('/streams.json', async (requestURL) => {
+router.get('/streams.json', async (requestURL, event) => {
   const key = requestURL.searchParams.get('key')
+  const reqIP = event.request.headers.get('cf-connecting-ip')
 
   let responseData = []
-  if (apiKeys.has(key)) {
+  if (apiKeys.has(key) || allowedIPs.has(reqIP)) {
     const dateFilter = requestURL.searchParams.get('date')
     const streams = await fetchStreams({ dateFilter })
     responseData = streams.filter(({ link, platform }) => link && platform)
@@ -103,7 +105,7 @@ addEventListener('fetch', async (event) => {
 
   try {
     if (match) {
-      event.respondWith(match.handler(requestURL))
+      event.respondWith(match.handler(requestURL, event))
     } else {
       throw createError(404)
     }
