@@ -62,7 +62,7 @@ const router = new Router()
 router.get('/streams.json', async (requestURL) => {
   const dateFilter = requestURL.searchParams.get('date')
   const streams = await fetchStreams({ dateFilter })
-  responseData = streams.filter(({ link, platform }) => link && platform)
+  const responseData = streams.filter(({ link, platform }) => link && platform)
   return new Response(JSON.stringify(responseData), {
     headers: {
       ...baseHeaders,
@@ -73,7 +73,7 @@ router.get('/streams.json', async (requestURL) => {
 
 router.get('/stats.json', async () => {
   const streams = await fetchStreams()
-  responseData = {
+  const responseData = {
     tracking: streams.length,
     live: streams.filter(({ status }) => status === 'Live').length,
   }
