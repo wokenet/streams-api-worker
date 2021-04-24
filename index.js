@@ -3,6 +3,8 @@ const createError = require('http-errors')
 const Papa = require('papaparse')
 const camelCase = require('lodash.camelcase')
 
+const apiKeys = new Set(API_KEYS.split(','))
+
 function parseCSV(csvString, config) {
   return new Promise((resolve, reject) => {
     Papa.parse(csvString, {
@@ -60,9 +62,15 @@ const cacheHeaders = {
 const router = new Router()
 
 router.get('/streams.json', async (requestURL) => {
-  const dateFilter = requestURL.searchParams.get('date')
-  const streams = await fetchStreams({ dateFilter })
-  const responseData = streams.filter(({ link, platform }) => link && platform)
+  const key = requestURL.searchParams.get('key')
+
+  let responseData = []
+  if (apiKeys.has(key)) {
+    const dateFilter = requestURL.searchParams.get('date')
+    const streams = await fetchStreams({ dateFilter })
+    responseData = streams.filter(({ link, platform }) => link && platform)
+  }
+
   return new Response(JSON.stringify(responseData), {
     headers: {
       ...baseHeaders,
